@@ -18,7 +18,8 @@
             android:layout_weight="1"
             android:text="Clock"
             android:gravity="center"
-            android:textSize="30sp"/>
+            android:textSize="30sp"
+            android:background="@color/blue"/>
 
         <TextView
             android:id="@+id/text_chronometer"
@@ -27,10 +28,12 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="StopWatch"
-            android:textSize="30sp" />
+            android:textSize="30sp"
+            android:background="@color/blue"/>
     </LinearLayout>
 
     <FrameLayout
+        android:elevation="5dp"
         android:id="@+id/fragment_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -38,7 +41,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:background="@color/colorAccent"/>
+        android:background="#000099"/>
 
 </android.support.constraint.ConstraintLayout>
 

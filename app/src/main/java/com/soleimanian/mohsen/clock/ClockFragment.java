@@ -1,6 +1,7 @@
 package com.soleimanian.mohsen.clock;
 
 import android.app.Fragment;
+import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,9 +25,12 @@ public class ClockFragment extends Fragment {
     MediaPlayer clock;
     MediaPlayer mHoures;
     MediaPlayer mMinutes;
-    MediaPlayer mSeconds;
 
     boolean isPM ;
+    boolean isClick = false;
+    boolean sw = true;
+
+    Thread updatetimepersecond = new Thread();
 
     @Nullable
     @Override
@@ -54,7 +58,11 @@ public class ClockFragment extends Fragment {
     }
 
     private void tellClock() {
+        Log.d("TAG" , ""+isClick);
+        if (isClick)
+            return;
 
+        isClick = true;
         String strHoures =  houres.getText().toString();
         String strMinutes = (String) minutes.getText();
         String strSeconder = (String) seconds.getText();
@@ -69,15 +77,12 @@ public class ClockFragment extends Fragment {
         switch (strHoures) {
             case "1" :
                 mHoures = MediaPlayer.create(getActivity(),R.raw.c1o);
-             //   mHoures.start();
                 break;
             case "2" :
                 mHoures = MediaPlayer.create(getActivity(),R.raw.c2o);
-               // mHoures.start();
                 break;
             case "3" :
                 mHoures = MediaPlayer.create(getActivity(),R.raw.c3o);
-               // mHoures.start();
                 break;
             case "4" :
                 mHoures = MediaPlayer.create(getActivity(),R.raw.c4o);
@@ -314,22 +319,25 @@ public class ClockFragment extends Fragment {
             public void run() {
                 if (isPM){
                     clock = MediaPlayer.create(getActivity() , R.raw.badezohr);
+                    isPM= false;
                 }
                 else
                     clock = MediaPlayer.create(getActivity() , R.raw.sob);
-
-            clock.start();
+                clock.start();
+                isClick = false;
             }
         },9000);
 
 
     }
     private void updateTime() {
-        Thread updatetimepersecond = new Thread(){
+         updatetimepersecond = new Thread(){
             @Override
             public void run() {
                 while (!isInterrupted()){
                     try {
+                        Log.d("TAG" , ""+isInterrupted());
+                        Log.d("TAG" , "in the while ");
                         Thread.sleep(1000);
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
@@ -353,7 +361,17 @@ public class ClockFragment extends Fragment {
             }
         };
         updatetimepersecond.start();
+
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d("TAG" , "the frament is pause ");
+        updatetimepersecond.interrupt();
+        Log.d("TAG2 " , ""+updatetimepersecond.isInterrupted());
+    }
+
     private String dayNormalize(int day) {
         String result;
         switch (day){
@@ -387,5 +405,15 @@ public class ClockFragment extends Fragment {
         minutes = view.findViewById(R.id.text_minutes);
         seconds = view.findViewById(R.id.text_second);
         tellTheClock = view.findViewById(R.id.button_tell);
+        setfont();
+    }
+
+    private void setfont() {
+        Typeface type = Typeface.createFromAsset(getActivity().getAssets(),"font/digital7.otf");
+        day.setTypeface(type);
+        houres.setTypeface(type);
+        minutes.setTypeface(type);
+        seconds.setTypeface(type);
+
     }
 }

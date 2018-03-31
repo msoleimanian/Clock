@@ -1,19 +1,14 @@
 package com.soleimanian.mohsen.clock;
 
-import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-
-import java.time.Clock;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
     TextView clock;
-    TextView chronometer;
+    TextView stopWatch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,14 +24,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 ClockFragment clockFragment = new ClockFragment();
-                getFragmentManager().beginTransaction().add(R.id.fragment_container, clockFragment).addToBackStack(null).commit();
+                getFragmentManager().beginTransaction().add(R.id.fragment_container, clockFragment).addToBackStack("one").commit();
+            }
+        });
+        stopWatch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                StopWatchFragment stopWatchFragment = new StopWatchFragment();
+                getFragmentManager().beginTransaction().add(R.id.fragment_container,stopWatchFragment).addToBackStack("two").commit();
             }
         });
     }
 
     private void findviews() {
         clock = (TextView) findViewById(R.id.text_clock);
-        chronometer = (TextView) findViewById(R.id.text_chronometer);
+        stopWatch = (TextView) findViewById(R.id.text_chronometer);
 
     }
 }
