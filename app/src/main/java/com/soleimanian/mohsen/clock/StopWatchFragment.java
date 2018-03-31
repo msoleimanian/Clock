@@ -101,6 +101,11 @@ public class StopWatchFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        MainActivity.isStopWatchSelected=false;
+    }
 
     private void findviews(View view) {
         show_time = (TextView) view.findViewById(R.id.time_show);

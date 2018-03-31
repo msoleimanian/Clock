@@ -32,6 +32,24 @@ public class ClockFragment extends Fragment {
 
     Thread updatetimepersecond = new Thread();
 
+    Handler updateTime = new Handler();
+    private Runnable updatepersecond  = new Runnable() {
+        @Override
+        public void run() {
+            Date date = new Date();
+            int intHours = date.getHours();
+            int intMinutes = date.getMinutes();
+            int intSeconds = date.getSeconds();
+            int intDay = date.getDay();
+            houres.setText(String.valueOf(intHours));
+            minutes.setText(String.valueOf(intMinutes));
+            seconds.setText(String.valueOf(intSeconds));
+            day.setText(dayNormalize(intDay));
+            updateTime.postDelayed(this,0);
+        }
+
+    };
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -307,6 +325,8 @@ public class ClockFragment extends Fragment {
             case "59" :
                 mMinutes = MediaPlayer.create(getActivity() , R.raw.c59min);
                 break;
+            default:
+                break;
         }
         handler.postDelayed(new Runnable() {
             @Override
@@ -331,45 +351,50 @@ public class ClockFragment extends Fragment {
 
     }
     private void updateTime() {
-         updatetimepersecond = new Thread(){
-            @Override
-            public void run() {
-                while (!isInterrupted()){
-                    try {
-                        Log.d("TAG" , ""+isInterrupted());
-                        Log.d("TAG" , "in the while ");
-                        Thread.sleep(1000);
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Date date = new Date();
-                                int intHours = date.getHours();
-                                int intMinutes = date.getMinutes();
-                                int intSeconds = date.getSeconds();
-                                int intDay = date.getDay();
-                                houres.setText(String.valueOf(intHours));
-                                minutes.setText(String.valueOf(intMinutes));
-                                seconds.setText(String.valueOf(intSeconds));
-                                day.setText(dayNormalize(intDay));
+//         updatetimepersecond = new Thread(){
+//            @Override
+//            public void run() {
+//                Log.d("TAG" , ""+isInterrupted());
+//                while (!isInterrupted()){
+//                    try {
+//                        Log.d("TAG" , "in the while ");
+//                        Thread.sleep(1000);
+//                        getActivity().runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                Date date = new Date();
+//                                int intHours = date.getHours();
+//                                int intMinutes = date.getMinutes();
+//                                int intSeconds = date.getSeconds();
+//                                int intDay = date.getDay();
+//                                houres.setText(String.valueOf(intHours));
+//                                minutes.setText(String.valueOf(intMinutes));
+//                                seconds.setText(String.valueOf(intSeconds));
+//                                day.setText(dayNormalize(intDay));
+//
+//                            }
+//                        });
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        };
+//        updatetimepersecond.start();
 
-                            }
-                        });
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        };
-        updatetimepersecond.start();
+        updateTime.postDelayed(updatepersecond,0);
 
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.d("TAG" , "the frament is pause ");
-        updatetimepersecond.interrupt();
-        Log.d("TAG2 " , ""+updatetimepersecond.isInterrupted());
+        MainActivity.isClockSelected = false;
+//        Log.d("TAG" , "the frament is pause ");
+//        updatetimepersecond.interrupt();
+//        updatetimepersecond.stop();
+//        Log.d("TAG2 " , ""+updatetimepersecond.isInterrupted());
+        updateTime.removeCallbacks(updatepersecond);
     }
 
     private String dayNormalize(int day) {
