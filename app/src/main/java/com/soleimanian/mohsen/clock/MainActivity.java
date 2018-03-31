@@ -10,6 +10,8 @@ public class MainActivity extends AppCompatActivity {
     TextView clock;
     TextView stopWatch;
 
+    boolean isClockSelected = false;
+    boolean isStopWatchSelected = false ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,6 +25,10 @@ public class MainActivity extends AppCompatActivity {
         clock.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (isClockSelected)
+                    return;
+                isClockSelected = true;
+                isStopWatchSelected = false;
                 ClockFragment clockFragment = new ClockFragment();
                 getFragmentManager().beginTransaction().add(R.id.fragment_container, clockFragment).addToBackStack("one").commit();
             }
@@ -30,6 +36,10 @@ public class MainActivity extends AppCompatActivity {
         stopWatch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (isStopWatchSelected)
+                    return;
+                isStopWatchSelected = true;
+                isClockSelected = false;
                 StopWatchFragment stopWatchFragment = new StopWatchFragment();
                 getFragmentManager().beginTransaction().add(R.id.fragment_container,stopWatchFragment).addToBackStack("two").commit();
             }

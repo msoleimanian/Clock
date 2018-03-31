@@ -25,6 +25,10 @@ public class StopWatchFragment extends Fragment {
     long timeinPause;
     long updateTimeAftePause ;
 
+    boolean ispause = false;
+    boolean isstart = false;
+    boolean isreset = false;
+
     Handler handler = new Handler();
 
     Runnable updateTime = new Runnable() {
@@ -61,6 +65,11 @@ public class StopWatchFragment extends Fragment {
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (isstart)
+                    return;
+                isstart = true;
+                ispause = false;
+                isreset = false;
                 startTime = SystemClock.uptimeMillis();
                 handler.postDelayed(updateTime,0);
             }
@@ -68,10 +77,30 @@ public class StopWatchFragment extends Fragment {
         pause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                
+                if (ispause)
+                    return;
+                ispause = true;
+                isstart = false;
+                isreset = false;
+                timeinPause += originalTime;
+                handler.removeCallbacks(updateTime);
+            }
+        });
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isreset)
+                    return;
+                isreset = true;
+                isstart = false;
+                ispause = false;
+                timeinPause = 0;
+                show_time.setText("0 : 00 : 000");
+                handler.removeCallbacks(updateTime);
             }
         });
     }
+
 
     private void findviews(View view) {
         show_time = (TextView) view.findViewById(R.id.time_show);
