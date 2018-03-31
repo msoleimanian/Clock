@@ -12,7 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.text.DateFormat;
 import java.util.Date;
+
 
 public class ClockFragment extends Fragment {
 
@@ -20,6 +23,7 @@ public class ClockFragment extends Fragment {
     TextView houres;
     TextView minutes;
     TextView seconds;
+    TextView date;
     Button tellTheClock;
 
     MediaPlayer clock;
@@ -36,16 +40,19 @@ public class ClockFragment extends Fragment {
     private Runnable updatepersecond  = new Runnable() {
         @Override
         public void run() {
-            Date date = new Date();
-            int intHours = date.getHours();
-            int intMinutes = date.getMinutes();
-            int intSeconds = date.getSeconds();
-            int intDay = date.getDay();
+            Date tempDate = new Date();
+            int intHours = tempDate.getHours();
+            int intMinutes = tempDate.getMinutes();
+            int intSeconds = tempDate.getSeconds();
+            int intDay = tempDate.getDay();
             houres.setText(String.valueOf(intHours));
             minutes.setText(String.valueOf(intMinutes));
             seconds.setText(String.valueOf(intSeconds));
-            day.setText(dayNormalize(intDay));
-            updateTime.postDelayed(this,0);
+            day.setText(String.valueOf(android.text.format.DateFormat.format("EEEE",tempDate)));
+            date.setText(String.valueOf(android.text.format.DateFormat.format("MMMM",tempDate))+"   " + String.valueOf(android.text.format.DateFormat.format("yyyy",tempDate))
+                   +"/" +String.valueOf(android.text.format.DateFormat.format("MM",tempDate))+"/"+String.valueOf(android.text.format.DateFormat.format("dd",tempDate)));
+
+            updateTime.postDelayed(this,1000);
         }
 
     };
@@ -425,17 +432,19 @@ public class ClockFragment extends Fragment {
         return result;
     }
     private void findviews(View view) {
-        day = view.findViewById(R.id.line2);
+        day = view.findViewById(R.id.day);
         houres = view.findViewById(R.id.text_hourse);
         minutes = view.findViewById(R.id.text_minutes);
         seconds = view.findViewById(R.id.text_second);
         tellTheClock = view.findViewById(R.id.button_tell);
+        date = view.findViewById(R.id.date);
         setfont();
     }
 
     private void setfont() {
         Typeface type = Typeface.createFromAsset(getActivity().getAssets(),"font/digital7.otf");
         day.setTypeface(type);
+        date.setTypeface(type);
         houres.setTypeface(type);
         minutes.setTypeface(type);
         seconds.setTypeface(type);
