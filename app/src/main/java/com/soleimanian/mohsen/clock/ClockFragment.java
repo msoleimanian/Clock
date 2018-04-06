@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +16,10 @@ import android.widget.TextView;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.EventListener;
 
 
-public class ClockFragment extends Fragment {
+public class ClockFragment extends Fragment implements EventListener{
 
     TextView day;
     TextView houres;
@@ -34,6 +36,8 @@ public class ClockFragment extends Fragment {
     boolean isClick = false;
     boolean sw = true;
 
+
+
     Thread updatetimepersecond = new Thread();
 
     Handler updateTime = new Handler();
@@ -49,8 +53,10 @@ public class ClockFragment extends Fragment {
             minutes.setText(String.valueOf(intMinutes));
             seconds.setText(String.valueOf(intSeconds));
             day.setText(String.valueOf(android.text.format.DateFormat.format("EEEE",tempDate)));
-            date.setText(String.valueOf(android.text.format.DateFormat.format("MMMM",tempDate))+"   " + String.valueOf(android.text.format.DateFormat.format("yyyy",tempDate))
-                   +"/" +String.valueOf(android.text.format.DateFormat.format("MM",tempDate))+"/"+String.valueOf(android.text.format.DateFormat.format("dd",tempDate)));
+            date.setText(String.valueOf(android.text.format.DateFormat.format("MMMM",tempDate))+"   "
+                    + String.valueOf(android.text.format.DateFormat.format("yyyy",tempDate))
+                   +"/" +String.valueOf(android.text.format.DateFormat.format("MM",tempDate))+"/"
+                    +String.valueOf(android.text.format.DateFormat.format("dd",tempDate)));
 
             updateTime.postDelayed(this,1000);
         }
@@ -94,10 +100,10 @@ public class ClockFragment extends Fragment {
 
         clock = MediaPlayer.create(getActivity(),R.raw.clock);
         clock.start();
-        if(Integer.parseInt(strHoures)>12){
-            strHoures = String.valueOf(Integer.parseInt(strHoures)-12);
-            isPM = true;
-        }
+//        if(Integer.parseInt(strHoures)>12){
+//            strHoures = String.valueOf(Integer.parseInt(strHoures)-12);
+//            isPM = true;
+//        }
 
         switch (strHoures) {
             case "1" :
@@ -111,39 +117,66 @@ public class ClockFragment extends Fragment {
                 break;
             case "4" :
                 mHoures = MediaPlayer.create(getActivity(),R.raw.c4o);
-            //    mHoures.start();
                 break;
             case "5" :
                 mHoures = MediaPlayer.create(getActivity(),R.raw.c5o);
-               // mHoures.start();
                 break;
             case "6" :
                 mHoures = MediaPlayer.create(getActivity(),R.raw.c6o);
-               // mHoures.start();
                 break;
             case "7" :
                 mHoures = MediaPlayer.create(getActivity(),R.raw.c7o);
-               // mHoures.start();
                 break;
             case "8" :
                 mHoures = MediaPlayer.create(getActivity(),R.raw.c8o);
-                //mHoures.start();
                 break;
             case "9" :
                 mHoures = MediaPlayer.create(getActivity(),R.raw.c9o);
-                //mHoures.start();
                 break;
             case "10" :
                 mHoures = MediaPlayer.create(getActivity(),R.raw.c10o);
-                //mHoures.start();
                 break;
             case "11" :
                 mHoures = MediaPlayer.create(getActivity(),R.raw.c11o);
-                //mHoures.start();
                 break;
             case "12" :
                 mHoures = MediaPlayer.create(getActivity(),R.raw.c12o);
-                //mHoures.start();
+                break;
+            case "13" :
+                mHoures = MediaPlayer.create(getActivity(),R.raw.c13o);
+                break;
+            case "14" :
+                mHoures = MediaPlayer.create(getActivity(),R.raw.c14o);
+                break;
+            case "15" :
+                mHoures = MediaPlayer.create(getActivity(),R.raw.c15o);
+                break;
+            case "16" :
+                mHoures = MediaPlayer.create(getActivity(),R.raw.c16o);
+                break;
+            case "17" :
+                mHoures = MediaPlayer.create(getActivity(),R.raw.c17o);
+                break;
+            case "18" :
+                mHoures = MediaPlayer.create(getActivity(),R.raw.c18o);
+                break;
+            case "19" :
+                mHoures = MediaPlayer.create(getActivity(),R.raw.c19o);
+                break;
+            case "20" :
+                mHoures = MediaPlayer.create(getActivity(),R.raw.c20o);
+                break;
+            case "21" :
+                mHoures = MediaPlayer.create(getActivity(),R.raw.c21o);
+                break;
+            case "22" :
+                mHoures = MediaPlayer.create(getActivity(),R.raw.c22o);
+                break;
+            case "23" :
+                mHoures = MediaPlayer.create(getActivity(),R.raw.c23o);
+                break;
+            case "0" :
+                mHoures = MediaPlayer.create(getActivity(),R.raw.c24o);
                 break;
         }
         Handler handler = new Handler();
@@ -332,28 +365,31 @@ public class ClockFragment extends Fragment {
             case "59" :
                 mMinutes = MediaPlayer.create(getActivity() , R.raw.c59min);
                 break;
-            default:
+            case "0" :
+                mMinutes = MediaPlayer.create(getActivity() , R.raw.c0min);
                 break;
         }
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 mMinutes.start();
-            }
-        },6000);
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (isPM){
-                    clock = MediaPlayer.create(getActivity() , R.raw.badezohr);
-                    isPM= false;
-                }
-                else
-                    clock = MediaPlayer.create(getActivity() , R.raw.sob);
-                clock.start();
                 isClick = false;
             }
-        },9000);
+        },6000);
+
+//        handler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                if (isPM){
+//                    clock = MediaPlayer.create(getActivity() , R.raw.badezohr);
+//                    isPM= false;
+//                }
+//                else
+//                    clock = MediaPlayer.create(getActivity() , R.raw.sob);
+//                clock.start();
+//                isClick = false;
+//            }
+//        },9000);
 
 
     }
@@ -404,33 +440,8 @@ public class ClockFragment extends Fragment {
         updateTime.removeCallbacks(updatepersecond);
     }
 
-    private String dayNormalize(int day) {
-        String result;
-        switch (day){
-            case 0 :
-                result = "Sunday";
-                break;
-            case 1 :
-                result = "Monday";
-                break;
-            case 2 :
-                result = "TuseDay";
-                break;
-            case 3 :
-                result = "Wednesday";
-                break;
-            case 4 :
-                result = "Thursday";
-                break;
-            case 5 :
-                result = "Friday";
-                break;
-            default  :
-                result = "Saturday";
-                break;
-        }
-        return result;
-    }
+
+
     private void findviews(View view) {
         day = view.findViewById(R.id.day);
         houres = view.findViewById(R.id.text_hourse);
