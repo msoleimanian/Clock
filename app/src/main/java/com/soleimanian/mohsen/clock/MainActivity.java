@@ -1,5 +1,6 @@
 package com.soleimanian.mohsen.clock;
 
+import android.app.Activity;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -7,7 +8,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
 
     TextView clock;
     TextView stopWatch;
@@ -23,11 +24,7 @@ public class MainActivity extends ActionBarActivity {
         configureOnClick();
     }
 
-    @Override
-    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
 
-        return super.onKeyLongPress(keyCode, event);
-    }
 
     private void configureOnClick() {
         clock.setOnClickListener(new View.OnClickListener() {

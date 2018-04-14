@@ -7,26 +7,28 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
-import java.text.DateFormat;
 import java.util.Date;
 import java.util.EventListener;
 
 
 public class ClockFragment extends Fragment implements EventListener{
 
-    TextView day;
-    TextView houres;
-    TextView minutes;
-    TextView seconds;
-    TextView date;
-    Button tellTheClock;
+    private TextView day;
+    private TextView houres;
+    private TextView minutes;
+    private TextView seconds;
+    private TextView date;
+    private Button tellTheClock;
+    private Switch aSwitch;
+    private MySharedPreferencesMnager mySharedPreferencesMnager;
 
     MediaPlayer clock;
     MediaPlayer mHoures;
@@ -35,12 +37,20 @@ public class ClockFragment extends Fragment implements EventListener{
     boolean isPM ;
     boolean isClick = false;
     boolean sw = true;
-
-
-
-    Thread updatetimepersecond = new Thread();
+    private boolean switchState;
+    private int orginalHoure;
 
     Handler updateTime = new Handler();
+
+    private void setCheckSwitch() {
+        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                switchState = b ;
+                Log.d("TAG" , "state 2: " + switchState);
+            }
+        });
+    }
     private Runnable updatepersecond  = new Runnable() {
         @Override
         public void run() {
@@ -49,6 +59,10 @@ public class ClockFragment extends Fragment implements EventListener{
             int intMinutes = tempDate.getMinutes();
             int intSeconds = tempDate.getSeconds();
             int intDay = tempDate.getDay();
+            Log.d("TAG" , "state : " + switchState);
+            orginalHoure = intHours;
+            if (switchState == true && intHours > 12)
+               intHours = intHours-12;
             houres.setText(String.valueOf(intHours));
             minutes.setText(String.valueOf(intMinutes));
             seconds.setText(String.valueOf(intSeconds));
@@ -63,6 +77,7 @@ public class ClockFragment extends Fragment implements EventListener{
 
     };
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -70,10 +85,16 @@ public class ClockFragment extends Fragment implements EventListener{
         return inflater.inflate(R.layout.fragment_clock ,container,false);
     }
 
+    public void setState(){
+        switchState = mySharedPreferencesMnager.getInstance(getActivity()).getSwitchState();
+        aSwitch.setChecked(switchState);
+
+    }
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         findviews(view);
+        setState();
         configureOnClick();
         updateTime();
 
@@ -94,16 +115,13 @@ public class ClockFragment extends Fragment implements EventListener{
             return;
 
         isClick = true;
-        String strHoures =  houres.getText().toString();
+        String strHoures =  String.valueOf(orginalHoure);
         String strMinutes = (String) minutes.getText();
         String strSeconder = (String) seconds.getText();
 
         clock = MediaPlayer.create(getActivity(),R.raw.clock);
         clock.start();
-//        if(Integer.parseInt(strHoures)>12){
-//            strHoures = String.valueOf(Integer.parseInt(strHoures)-12);
-//            isPM = true;
-//        }
+
 
         switch (strHoures) {
             case "1" :
@@ -377,53 +395,8 @@ public class ClockFragment extends Fragment implements EventListener{
             }
         },6000);
 
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                if (isPM){
-//                    clock = MediaPlayer.create(getActivity() , R.raw.badezohr);
-//                    isPM= false;
-//                }
-//                else
-//                    clock = MediaPlayer.create(getActivity() , R.raw.sob);
-//                clock.start();
-//                isClick = false;
-//            }
-//        },9000);
-
-
     }
     private void updateTime() {
-//         updatetimepersecond = new Thread(){
-//            @Override
-//            public void run() {
-//                Log.d("TAG" , ""+isInterrupted());
-//                while (!isInterrupted()){
-//                    try {
-//                        Log.d("TAG" , "in the while ");
-//                        Thread.sleep(1000);
-//                        getActivity().runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                Date date = new Date();
-//                                int intHours = date.getHours();
-//                                int intMinutes = date.getMinutes();
-//                                int intSeconds = date.getSeconds();
-//                                int intDay = date.getDay();
-//                                houres.setText(String.valueOf(intHours));
-//                                minutes.setText(String.valueOf(intMinutes));
-//                                seconds.setText(String.valueOf(intSeconds));
-//                                day.setText(dayNormalize(intDay));
-//
-//                            }
-//                        });
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//        };
-//        updatetimepersecond.start();
 
         updateTime.postDelayed(updatepersecond,0);
 
@@ -433,10 +406,6 @@ public class ClockFragment extends Fragment implements EventListener{
     public void onPause() {
         super.onPause();
         MainActivity.isClockSelected = false;
-//        Log.d("TAG" , "the frament is pause ");
-//        updatetimepersecond.interrupt();
-//        updatetimepersecond.stop();
-//        Log.d("TAG2 " , ""+updatetimepersecond.isInterrupted());
         updateTime.removeCallbacks(updatepersecond);
     }
 
@@ -449,8 +418,12 @@ public class ClockFragment extends Fragment implements EventListener{
         seconds = view.findViewById(R.id.text_second);
         tellTheClock = view.findViewById(R.id.button_tell);
         date = view.findViewById(R.id.date);
+        aSwitch = view.findViewById(R.id.clock_switch);
+        setCheckSwitch();
         setfont();
     }
+
+
 
     private void setfont() {
         Typeface type = Typeface.createFromAsset(getActivity().getAssets(),"font/digital7.otf");
@@ -460,5 +433,12 @@ public class ClockFragment extends Fragment implements EventListener{
         minutes.setTypeface(type);
         seconds.setTypeface(type);
 
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mySharedPreferencesMnager.getInstance(getActivity()).putSwitchState(switchState);
+        Log.d("TAG" , " this is on stop");
     }
 }
