@@ -110,7 +110,7 @@ public class ClockFragment extends Fragment implements EventListener {
 
     }
 
-    @SuppressLint("ResourceAsColor")
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -135,6 +135,7 @@ public class ClockFragment extends Fragment implements EventListener {
                 seconds.setTextColor(R.color.white);
                 colon.setTextColor(R.color.white);
             }
+            updateTime();
         }
     }
 
