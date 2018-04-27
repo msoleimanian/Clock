@@ -1,6 +1,8 @@
 package com.soleimanian.mohsen.clock;
 
+import android.annotation.SuppressLint;
 import android.app.Fragment;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -19,26 +21,31 @@ import java.util.Date;
 import java.util.EventListener;
 
 
-public class ClockFragment extends Fragment implements EventListener{
+public class ClockFragment extends Fragment implements EventListener {
 
     private TextView day;
     private TextView houres;
     private TextView minutes;
     private TextView seconds;
     private TextView date;
+    private TextView colon;
     private Button tellTheClock;
+    private Button setting;
     private Switch aSwitch;
+
+
     private MySharedPreferencesMnager mySharedPreferencesMnager;
 
     MediaPlayer clock;
     MediaPlayer mHoures;
     MediaPlayer mMinutes;
 
-    boolean isPM ;
+    boolean isPM;
     boolean isClick = false;
     boolean sw = true;
     private boolean switchState;
     private int orginalHoure;
+    private int REQ_CODE = 1;
 
     Handler updateTime = new Handler();
 
@@ -46,12 +53,13 @@ public class ClockFragment extends Fragment implements EventListener{
         aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                switchState = b ;
-                Log.d("TAG" , "state 2: " + switchState);
+                switchState = b;
+                Log.d("TAG", "state 2: " + switchState);
             }
         });
     }
-    private Runnable updatepersecond  = new Runnable() {
+
+    private Runnable updatepersecond = new Runnable() {
         @Override
         public void run() {
             Date tempDate = new Date();
@@ -59,20 +67,20 @@ public class ClockFragment extends Fragment implements EventListener{
             int intMinutes = tempDate.getMinutes();
             int intSeconds = tempDate.getSeconds();
             int intDay = tempDate.getDay();
-            Log.d("TAG" , "state : " + switchState);
+            Log.d("TAG", "state : " + switchState);
             orginalHoure = intHours;
             if (switchState == true && intHours > 12)
-               intHours = intHours-12;
+                intHours = intHours - 12;
             houres.setText(String.valueOf(intHours));
             minutes.setText(String.valueOf(intMinutes));
             seconds.setText(String.valueOf(intSeconds));
-            day.setText(String.valueOf(android.text.format.DateFormat.format("EEEE",tempDate)));
-            date.setText(String.valueOf(android.text.format.DateFormat.format("MMMM",tempDate))+"   "
-                    + String.valueOf(android.text.format.DateFormat.format("yyyy",tempDate))
-                   +"/" +String.valueOf(android.text.format.DateFormat.format("MM",tempDate))+"/"
-                    +String.valueOf(android.text.format.DateFormat.format("dd",tempDate)));
+            day.setText(String.valueOf(android.text.format.DateFormat.format("EEEE", tempDate)));
+            date.setText(String.valueOf(android.text.format.DateFormat.format("MMMM", tempDate)) + "   "
+                    + String.valueOf(android.text.format.DateFormat.format("yyyy", tempDate))
+                    + "/" + String.valueOf(android.text.format.DateFormat.format("MM", tempDate)) + "/"
+                    + String.valueOf(android.text.format.DateFormat.format("dd", tempDate)));
 
-            updateTime.postDelayed(this,1000);
+            updateTime.postDelayed(this, 1000);
         }
 
     };
@@ -82,14 +90,15 @@ public class ClockFragment extends Fragment implements EventListener{
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
-        return inflater.inflate(R.layout.fragment_clock ,container,false);
+        return inflater.inflate(R.layout.fragment_clock, container, false);
     }
 
-    public void setState(){
+    public void setState() {
         switchState = mySharedPreferencesMnager.getInstance(getActivity()).getSwitchState();
         aSwitch.setChecked(switchState);
 
     }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -98,9 +107,48 @@ public class ClockFragment extends Fragment implements EventListener{
         configureOnClick();
         updateTime();
 
+
+    }
+
+    @SuppressLint("ResourceAsColor")
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode==REQ_CODE){
+            String color = data.getStringExtra("color");
+            Log.d("TAG23" , color);
+            if (color.equals("RED COLOR")){
+                day.setTextColor(R.color.red);
+                date.setTextColor(R.color.red);
+                houres.setTextColor(R.color.red);
+                minutes.setTextColor(R.color.red);
+                seconds.setTextColor(R.color.red);
+                seconds.setTextColor(R.color.red);
+                colon.setTextColor(R.color.red);
+            }
+            if (color.equals("WHITE COLOR")){
+                day.setTextColor(R.color.white);
+                date.setTextColor(R.color.white);
+                houres.setTextColor(R.color.white);
+                minutes.setTextColor(R.color.white);
+                seconds.setTextColor(R.color.white);
+                seconds.setTextColor(R.color.white);
+                colon.setTextColor(R.color.white);
+            }
+        }
     }
 
     private void configureOnClick() {
+
+        setting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity() , Setting.class);
+                startActivityForResult(intent , 1);
+
+            }
+        });
+
         tellTheClock.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -110,91 +158,91 @@ public class ClockFragment extends Fragment implements EventListener{
     }
 
     private void tellClock() {
-        Log.d("TAG" , ""+isClick);
+        Log.d("TAG", "" + isClick);
         if (isClick)
             return;
 
         isClick = true;
-        String strHoures =  String.valueOf(orginalHoure);
+        String strHoures = String.valueOf(orginalHoure);
         String strMinutes = (String) minutes.getText();
         String strSeconder = (String) seconds.getText();
 
-        clock = MediaPlayer.create(getActivity(),R.raw.clock);
+        clock = MediaPlayer.create(getActivity(), R.raw.clock);
         clock.start();
 
 
         switch (strHoures) {
-            case "1" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c1o);
+            case "1":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c1o);
                 break;
-            case "2" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c2o);
+            case "2":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c2o);
                 break;
-            case "3" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c3o);
+            case "3":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c3o);
                 break;
-            case "4" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c4o);
+            case "4":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c4o);
                 break;
-            case "5" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c5o);
+            case "5":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c5o);
                 break;
-            case "6" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c6o);
+            case "6":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c6o);
                 break;
-            case "7" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c7o);
+            case "7":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c7o);
                 break;
-            case "8" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c8o);
+            case "8":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c8o);
                 break;
-            case "9" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c9o);
+            case "9":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c9o);
                 break;
-            case "10" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c10o);
+            case "10":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c10o);
                 break;
-            case "11" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c11o);
+            case "11":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c11o);
                 break;
-            case "12" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c12o);
+            case "12":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c12o);
                 break;
-            case "13" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c13o);
+            case "13":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c13o);
                 break;
-            case "14" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c14o);
+            case "14":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c14o);
                 break;
-            case "15" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c15o);
+            case "15":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c15o);
                 break;
-            case "16" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c16o);
+            case "16":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c16o);
                 break;
-            case "17" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c17o);
+            case "17":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c17o);
                 break;
-            case "18" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c18o);
+            case "18":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c18o);
                 break;
-            case "19" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c19o);
+            case "19":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c19o);
                 break;
-            case "20" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c20o);
+            case "20":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c20o);
                 break;
-            case "21" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c21o);
+            case "21":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c21o);
                 break;
-            case "22" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c22o);
+            case "22":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c22o);
                 break;
-            case "23" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c23o);
+            case "23":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c23o);
                 break;
-            case "0" :
-                mHoures = MediaPlayer.create(getActivity(),R.raw.c24o);
+            case "0":
+                mHoures = MediaPlayer.create(getActivity(), R.raw.c24o);
                 break;
         }
         Handler handler = new Handler();
@@ -203,188 +251,188 @@ public class ClockFragment extends Fragment implements EventListener{
             public void run() {
                 mHoures.start();
             }
-        },3000);
+        }, 3000);
 
-        switch (strMinutes){
-            case "1" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c1min);
+        switch (strMinutes) {
+            case "1":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c1min);
                 break;
-            case "2" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c2min);
+            case "2":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c2min);
                 break;
-            case "3" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c3min);
+            case "3":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c3min);
                 break;
-            case "4" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c4min);
+            case "4":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c4min);
                 break;
-            case "5" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c5min);
+            case "5":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c5min);
                 break;
-            case "6" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c6min);
+            case "6":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c6min);
                 break;
-            case "7" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c7min);
+            case "7":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c7min);
                 break;
-            case "8" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c8min);
+            case "8":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c8min);
                 break;
-            case "9" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c9min);
+            case "9":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c9min);
                 break;
-            case "10" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c10min);
+            case "10":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c10min);
                 break;
-            case "11" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c11min);
+            case "11":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c11min);
                 break;
-            case "12" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c12min);
+            case "12":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c12min);
                 break;
-            case "13" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c13min);
+            case "13":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c13min);
                 break;
-            case "14" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c14min);
+            case "14":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c14min);
                 break;
-            case "15" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c15min);
+            case "15":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c15min);
                 break;
-            case "16" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c16min);
+            case "16":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c16min);
                 break;
-            case "17" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c17min);
+            case "17":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c17min);
                 break;
-            case "18" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c18min);
+            case "18":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c18min);
                 break;
-            case "19" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c19min);
+            case "19":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c19min);
                 break;
-            case "20" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c20min);
+            case "20":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c20min);
                 break;
-            case "21" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c21min);
+            case "21":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c21min);
                 break;
-            case "22" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c22min);
+            case "22":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c22min);
                 break;
-            case "23" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c23min);
+            case "23":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c23min);
                 break;
-            case "24" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c24min);
+            case "24":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c24min);
                 break;
-            case "25" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c25min);
+            case "25":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c25min);
                 break;
-            case "26" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c26min);
+            case "26":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c26min);
                 break;
-            case "27" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c27min);
+            case "27":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c27min);
                 break;
-            case "28" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c28min);
+            case "28":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c28min);
                 break;
-            case "29" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c29min);
+            case "29":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c29min);
                 break;
-            case "30" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c30min);
+            case "30":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c30min);
                 break;
-            case "31" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c31min);
+            case "31":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c31min);
                 break;
-            case "32" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c32min);
+            case "32":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c32min);
                 break;
-            case "33" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c33min);
+            case "33":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c33min);
                 break;
-            case "34" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c34min);
+            case "34":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c34min);
                 break;
-            case "35" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c35min);
+            case "35":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c35min);
                 break;
-            case "36" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c36min);
+            case "36":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c36min);
                 break;
-            case "37" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c37min);
+            case "37":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c37min);
                 break;
-            case "38" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c38min);
+            case "38":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c38min);
                 break;
-            case "39" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c39min);
+            case "39":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c39min);
                 break;
-            case "40" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c40min);
+            case "40":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c40min);
                 break;
-            case "41" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c41min);
+            case "41":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c41min);
                 break;
-            case "42" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c42min);
+            case "42":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c42min);
                 break;
-            case "43" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c43min);
+            case "43":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c43min);
                 break;
-            case "44" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c44min);
+            case "44":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c44min);
                 break;
-            case "45" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c45min);
+            case "45":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c45min);
                 break;
-            case "46" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c46min);
+            case "46":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c46min);
                 break;
-            case "47" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c47min);
+            case "47":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c47min);
                 break;
-            case "48" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c48min);
+            case "48":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c48min);
                 break;
-            case "49" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c49min);
+            case "49":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c49min);
                 break;
-            case "50" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c50min);
+            case "50":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c50min);
                 break;
-            case "51" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c51min);
+            case "51":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c51min);
                 break;
-            case "52" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c52min);
+            case "52":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c52min);
                 break;
-            case "53" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c53min);
+            case "53":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c53min);
                 break;
-            case "54" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c54min);
+            case "54":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c54min);
                 break;
-            case "55" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c55min);
+            case "55":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c55min);
                 break;
-            case "56" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c56min);
+            case "56":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c56min);
                 break;
-            case "57" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c57min);
+            case "57":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c57min);
                 break;
-            case "58" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c58min);
+            case "58":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c58min);
                 break;
-            case "59" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c59min);
+            case "59":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c59min);
                 break;
-            case "0" :
-                mMinutes = MediaPlayer.create(getActivity() , R.raw.c0min);
+            case "0":
+                mMinutes = MediaPlayer.create(getActivity(), R.raw.c0min);
                 break;
         }
         handler.postDelayed(new Runnable() {
@@ -393,12 +441,13 @@ public class ClockFragment extends Fragment implements EventListener{
                 mMinutes.start();
                 isClick = false;
             }
-        },6000);
+        }, 6000);
 
     }
+
     private void updateTime() {
 
-        updateTime.postDelayed(updatepersecond,0);
+        updateTime.postDelayed(updatepersecond, 0);
 
     }
 
@@ -410,7 +459,6 @@ public class ClockFragment extends Fragment implements EventListener{
     }
 
 
-
     private void findviews(View view) {
         day = view.findViewById(R.id.day);
         houres = view.findViewById(R.id.text_hourse);
@@ -419,26 +467,26 @@ public class ClockFragment extends Fragment implements EventListener{
         tellTheClock = view.findViewById(R.id.button_tell);
         date = view.findViewById(R.id.date);
         aSwitch = view.findViewById(R.id.clock_switch);
+        setting = view.findViewById(R.id.setting);
+        colon = view.findViewById(R.id.colon);
         setCheckSwitch();
         setfont();
     }
 
 
-
     private void setfont() {
-        Typeface type = Typeface.createFromAsset(getActivity().getAssets(),"font/digital7.otf");
+        Typeface type = Typeface.createFromAsset(getActivity().getAssets(), "font/digital7.otf");
         day.setTypeface(type);
         date.setTypeface(type);
         houres.setTypeface(type);
         minutes.setTypeface(type);
         seconds.setTypeface(type);
-
     }
 
     @Override
     public void onStop() {
         super.onStop();
         mySharedPreferencesMnager.getInstance(getActivity()).putSwitchState(switchState);
-        Log.d("TAG" , " this is on stop");
+        Log.d("TAG", " this is on stop");
     }
 }
